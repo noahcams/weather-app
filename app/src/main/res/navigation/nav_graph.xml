@@ -12,10 +12,6 @@
         <action
             android:id="@+id/action_home_to_radar"
             app:destination="@id/radarFragment" />
-<!--        <argument-->
-<!--            android:name="cityId"-->
-<!--            app:argType="String"-->
-<!--            android:defaultValue="4054852" />-->
     </fragment>
     <fragment
         android:id="@+id/radarFragment"

@@ -3,7 +3,6 @@ package com.example.weatherapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.model.WeatherRepo
-import com.example.weatherapp.model.WeatherRepo.CHELSEA_ID
 import com.example.weatherapp.util.ViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
