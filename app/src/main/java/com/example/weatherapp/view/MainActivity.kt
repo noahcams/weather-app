@@ -1,22 +1,29 @@
 package com.example.weatherapp.view
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.databinding.ActivityMainBinding
+import com.example.weatherapp.model.City
+import com.example.weatherapp.viewmodel.HomeViewModel
 
 
 class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val viewModel by viewModels<HomeViewModel>()
 
     /**
      * The pager widget, which handles animation and allows swiping horizontally to access previous
      * and next wizard steps.
      */
-    private lateinit var mPager: ViewPager
+    private lateinit var mPager: ViewPager2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,10 +32,10 @@ class MainActivity : AppCompatActivity() {
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = binding.viewPager
 
-      // The pager adapter, which provides the pages to the view pager widget.
-        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+        // The pager adapter, which provides the pages to the view pager widget.
+        val pagerAdapter = ScreenSlidePagerAdapter(viewModel.weatherResponses.size, this)
         mPager.adapter = pagerAdapter
-  }
+    }
 
     override fun onBackPressed() {
         if (mPager.currentItem == 0) {
@@ -41,14 +48,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-  /**
-   * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-   * sequence.
-   */
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
-        FragmentStatePagerAdapter(fm) {
-        override fun getCount(): Int = 1
+    /**
+     * A simple pager adapter that represents HomeFragment objects, in
+     * sequence.
+     */
+    private inner class ScreenSlidePagerAdapter(
+        private val listSize: Int,
+        fa: FragmentActivity
+    ) : FragmentStateAdapter(fa) {
+        override fun getItemCount(): Int = listSize
 
-        override fun getItem(position: Int): Fragment = HomeFragment()
+        override fun createFragment(position: Int): Fragment = HomeFragment()
     }
 }
