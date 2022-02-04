@@ -18,6 +18,7 @@ import com.example.weatherapp.adapter.DailyAdapter
 import com.example.weatherapp.adapter.HourlyAdapter
 import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.example.weatherapp.model.City
+import com.example.weatherapp.model.WeatherRepo
 import com.example.weatherapp.viewmodel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collect
@@ -35,6 +36,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = FragmentHomeBinding.inflate(inflater, container, false).also {
+        lifecycleScope.launch { viewModel.initializeVM(WeatherRepo.CHELSEA) }
         _binding = it
     }.root
 
@@ -56,7 +58,7 @@ class HomeFragment : Fragment() {
             override fun onQueryTextSubmit(qString: String?): Boolean = with(searchIcon) {
                 lifecycleScope.launch {
                     val cleanString = qString?.trim()?.lowercase()?.replace(" ", "")
-                    if (viewModel.initializeVM(cleanString ?: viewModel.cityId.value)) {
+                    if (viewModel.initializeVM(cleanString ?: viewModel.cityName.value)) {
                         setQuery("", false)
                         clearFocus()
                     } else {
@@ -73,7 +75,7 @@ class HomeFragment : Fragment() {
         /** Sends the user to the radar and passes the cityId to the radar fragment */
         radarIcon.setOnClickListener {
             val action = HomeFragmentDirections.actionHomeToRadar().actionId
-            val bundle = bundleOf("cityId" to viewModel.cityId.value)
+            val bundle = bundleOf("cityId" to viewModel.cityName.value)
             findNavController().navigate(action, bundle)
         }
     }
@@ -85,7 +87,7 @@ class HomeFragment : Fragment() {
                 if (state is ViewState.Success) handleSuccess(state.city)
                 if (state is ViewState.Error) handleErrors(state.exception)
             }
-            cityId.collect {
+            cityName.collect {
                 initializeVM(it)
             }
         }

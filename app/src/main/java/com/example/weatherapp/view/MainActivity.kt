@@ -1,18 +1,18 @@
 package com.example.weatherapp.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.viewpager.widget.ViewPager
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.weatherapp.databinding.ActivityMainBinding
-import com.example.weatherapp.model.City
 import com.example.weatherapp.viewmodel.HomeViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,10 +31,19 @@ class MainActivity : AppCompatActivity() {
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = binding.viewPager
-
+//        val listSize =
+//            if (viewModel.weatherResponses.size == 0) 1 else viewModel.weatherResponses.size
         // The pager adapter, which provides the pages to the view pager widget.
-        val pagerAdapter = ScreenSlidePagerAdapter(viewModel.weatherResponses.size, this)
-        mPager.adapter = pagerAdapter
+        initObservers()
+    }
+
+    private fun initObservers() {
+        lifecycleScope.launchWhenStarted {
+            viewModel.fragmentListSize.collect {
+                val pagerAdapter = WeatherPagerAdapter(this@MainActivity)
+                mPager.adapter = pagerAdapter
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -52,11 +61,19 @@ class MainActivity : AppCompatActivity() {
      * A simple pager adapter that represents HomeFragment objects, in
      * sequence.
      */
-    private inner class ScreenSlidePagerAdapter(
-        private val listSize: Int,
+    private inner class WeatherPagerAdapter(
         fa: FragmentActivity
     ) : FragmentStateAdapter(fa) {
-        override fun getItemCount(): Int = listSize
+        override fun getItemCount(): Int {
+            var size = 0
+            lifecycleScope.launchWhenStarted {
+                viewModel.fragmentListSize.collect {
+                    size = it
+                }
+            }
+            Log.d("numItems: ", size.toString())
+            return size
+        }
 
         override fun createFragment(position: Int): Fragment = HomeFragment()
     }
