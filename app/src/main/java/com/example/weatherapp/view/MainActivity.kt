@@ -65,14 +65,7 @@ class MainActivity : AppCompatActivity() {
         fa: FragmentActivity
     ) : FragmentStateAdapter(fa) {
         override fun getItemCount(): Int {
-//            var size = 0
-//            lifecycleScope.launchWhenStarted {
-//                viewModel.fragmentListSize.collect {
-//                    size = it
-//                }
-//            }
-//            Log.d("numItems: ", size.toString())
-            return 3
+            return viewModel.fragmentListSize.value
         }
 
         override fun createFragment(position: Int): Fragment = HomeFragment()
