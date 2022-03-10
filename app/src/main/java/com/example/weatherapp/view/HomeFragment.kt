@@ -1,6 +1,7 @@
 package com.example.weatherapp.view
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.example.weatherapp.adapter.DailyAdapter
 import com.example.weatherapp.adapter.HourlyAdapter
 import com.example.weatherapp.databinding.FragmentHomeBinding
+import com.example.weatherapp.di.DaggerWeatherComponent
 import com.example.weatherapp.model.City
 import com.example.weatherapp.viewmodel.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -24,11 +26,24 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private val viewModel by viewModels<HomeViewModel>()
+    @Inject lateinit var viewModel: HomeViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        initDagger()
+        super.onCreate(savedInstanceState)
+    }
+
+    private fun initDagger() {
+        DaggerWeatherComponent.builder()
+            .context(requireContext())
+            .build()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +52,7 @@ class HomeFragment : Fragment() {
     ) = FragmentHomeBinding.inflate(inflater, container, false).also {
         _binding = it
     }.root
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -96,6 +112,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleSuccess(city: City) = with(binding) {
+        Log.d("Glide", "handleSuccess running...")
         Glide.with(root)
             .load(city.city.imageURLs.androidImageURLs.xhdpiImageURL)
             .into(topBackground)

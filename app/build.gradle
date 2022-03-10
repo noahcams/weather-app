@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'androidx.navigation.safeargs.kotlin'
+    id "kotlin-kapt"
+    id "dagger.hilt.android.plugin"
 }
 
 android {
@@ -34,6 +36,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        exclude 'META-INF/gradle/incremental.annotation.processors'
+    }
 
 }
 
@@ -55,6 +60,9 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
     // Using gifs
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+    // Hilt
+    implementation 'com.google.dagger:hilt-android:2.40.5'
+    kapt 'com.google.dagger:hilt-android-compiler:2.40.5'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
